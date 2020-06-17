@@ -52,7 +52,7 @@ class ShoppingList extends Component {
                   >
                     &times;
                   </Button>
-                  { name }
+                  { name } 
                 </ListGroupItem>
               </CSSTransition>
             ))}
