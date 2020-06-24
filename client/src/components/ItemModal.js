@@ -11,7 +11,7 @@ import {
 } from 'reactstrap';
 import { connect } from 'react-redux';
 import { addItem } from '../actions/itemActions';
-import uuid from 'uuid/dist/v4';
+// import uuid from 'uuid/dist/v4';
 
 class ItemModal extends Component {
   state = {
@@ -33,9 +33,7 @@ class ItemModal extends Component {
     e.preventDefault();
 
     // when we deal with back end mongo creates its own id
-    // so we need to generate id
     const newItem = {
-      id: uuid(),
       name: this.state.name,
     };
 
