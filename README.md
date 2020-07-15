@@ -35,3 +35,5 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 ```
+
+- Implementing JWT Auth.
