@@ -37,3 +37,10 @@ if (process.env.NODE_ENV === 'production') {
 ```
 
 - Implementing JWT Auth.
+
+## JWT Auth 
+- Create the model (in our case we will be creating user model).
+
+- updated server for body parsing, used express default body parser. 
+
+- Installed bcrypt, implemented on the post method.  
