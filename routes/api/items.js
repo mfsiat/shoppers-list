@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const auth = require('../../middleware/auth');
 
 // Item model 
 // creates the query 
@@ -18,10 +19,9 @@ router.get('/', (req, res) => {
 
 // @route POST api/items
 // @desc create a item 
-// @access Public 
-// we are using router so router.get
-router.post('/', (req, res) => {
-  // create a new object
+// @access Private
+// to protect the route, adding auth as 2nd parameter
+router.post('/', auth, (req, res) => {
   const newItem = new Item({
     name: req.body.name
   });
@@ -31,9 +31,8 @@ router.post('/', (req, res) => {
 
 // @route DELETE api/items/:id
 // @desc delete a item 
-// @access Public 
-// we are using router so router.get
-router.delete('/:id', (req, res) => {
+// @access Private
+router.delete('/:id', auth, (req, res) => {
   // we need to find the item 
   Item.findById(req.params.id)
     .then(item => item.remove().then(() => res.json({success: true}))

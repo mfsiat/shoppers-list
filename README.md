@@ -38,9 +38,73 @@ if (process.env.NODE_ENV === 'production') {
 
 - Implementing JWT Auth.
 
+- moving the secret keys' to config folder. (used config package)
+
 ## JWT Auth 
 - Create the model (in our case we will be creating user model).
 
 - updated server for body parsing, used express default body parser. 
 
 - Installed bcrypt, implemented on the post method.  
+
+- access jwt through router 
+```js
+router.post("/", (req, res) => {
+  const { name, email, password } = req.body;
+
+  // simple validation
+  if (!name || !email || !password) {
+    return res.status(400).json({ msg: "Please enter all fields" });
+  }
+
+  // check for existing user
+  User.findOne({ email }).then((user) => {
+    if (user) return res.status(400).json({ msg: "User already exists" });
+
+    const newUser = new User({
+      name,
+      email,
+      password,
+    });
+
+    // create salt & hash
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(newUser.password, salt, (err, hash) => {
+        if (err) throw err;
+        newUser.password = hash;
+        newUser.save().then((user) => {
+          res.json({
+            user: {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+            },
+          });
+        });
+      });
+    });
+  });
+});
+
+```
+
+- To create the token first sign then create the token 
+```js 
+// goes inside the promise 
+    jwt.sign(
+      { id: user.id },
+      config.get('jwtSecret'),
+      { expiresIn: 3600 },
+      (err, token) => {
+        if(err) throw err;
+        res.json({
+          token,
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+          },
+        });
+      }
+    )
+```

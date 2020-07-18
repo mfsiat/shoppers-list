@@ -2,17 +2,18 @@ const express = require('express');
 const mongoose = require('mongoose');
 // const bodyParser = require('body-parser');
 const path = require('path');
+const config = require('config');
 
 // add the api
 // const items = require('./routes/api/items');
 
 const app = express();
 
-// Bodyparser Middleware
+// Body parser Middleware
 app.use(express.json());
 
 // DB config
-const db = require('./config/keys').mongoURI;
+const db = config.get('mongoURI');
 
 // Connect to mongo
 // this is promise based
@@ -30,6 +31,7 @@ mongoose
 // anything that goes to api/items will refer to items variable
 app.use('/api/items', require('./routes/api/items'));
 app.use('/api/users', require('./routes/api/users'));
+app.use('/api/auth', require('./routes/api/auth'));
 
 // Serve static assets if in production
 if (process.env.NODE_ENV === 'production') {

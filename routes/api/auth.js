@@ -3,42 +3,33 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const config = require('config');
 const jwt = require('jsonwebtoken');
+const auth = require('../../middleware/auth');
 
 // Item model
 // creates the query
 const User = require("../../models/User");
 
-// @route POST api/users
-// @desc Register new users
+// @route POST api/auth
+// @desc auth user
 // @access Public
-// we are using router so router.get
-// we will get the value on req.body
-// pull out some data from them
+
 router.post("/", (req, res) => {
-  const { name, email, password } = req.body;
+  const { email, password } = req.body;
 
   // simple validation
-  if (!name || !email || !password) {
+  if (!email || !password) {
     return res.status(400).json({ msg: "Please enter all fields" });
   }
 
   // check for existing user
   User.findOne({ email }).then((user) => {
-    if (user) return res.status(400).json({ msg: "User already exists" });
+    if (!user) return res.status(400).json({ msg: "User Does not exists" });
+    
+    // Validate password 
+    bcrypt.compare(password, user.password).then(isMatch => {
+        if(!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
 
-    const newUser = new User({
-      name,
-      email,
-      password,
-    });
-
-    // create salt & hash
-    bcrypt.genSalt(10, (err, salt) => {
-      bcrypt.hash(newUser.password, salt, (err, hash) => {
-        if (err) throw err;
-        newUser.password = hash;
-        newUser.save().then((user) => {
-          jwt.sign(
+        jwt.sign(
             { id: user.id },
             config.get('jwtSecret'),
             { expiresIn: 3600 },
@@ -54,11 +45,16 @@ router.post("/", (req, res) => {
               });
             }
           )
-        });
-      });
-    });
+    })
   });
 });
+
+// @route GET api/auth/user
+// @desc Get user data 
+// @access private
+router.get('/user', auth, (req, res) => {
+    User.findById(req.user.id).select('-password').then(user => res.json(user));
+})
 
 // this is es6 fashion
 // export default router
